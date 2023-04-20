@@ -1,0 +1,124 @@
+import React, { useCallback, useEffect, useContext, useMemo } from "react";
+import Key from "./Key";
+import { AppContext } from "../App";
+
+function Keyboard() {
+  const {
+    board,
+    disabledLetters,
+    currAttempt,
+    correctWord,
+    gameOver,
+    onSelectLetter,
+    onEnter,
+    onDelete,
+  } = useContext(AppContext);
+
+  const keys1 = useMemo(() => ["Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P"], []);
+  const keys2 = useMemo(() => ["A", "S", "D", "F", "G", "H", "J", "K", "L"], []);
+  const keys3 = useMemo(() => ["Z", "X", "C", "V", "B", "N", "M"], []);
+
+  const handleKeyboard = useCallback(
+    (event) => {
+      if (gameOver.gameOver) return;
+      if (event.key === "Enter") {
+        onEnter();
+      } else if (event.key === "Backspace") {
+        onDelete();
+      } else {
+        keys1.forEach((key) => {
+          if (event.key.toLowerCase() === key.toLowerCase()) {
+            onSelectLetter(key);
+          }
+        });
+        keys2.forEach((key) => {
+          if (event.key.toLowerCase() === key.toLowerCase()) {
+            onSelectLetter(key);
+          }
+        });
+        keys3.forEach((key) => {
+          if (event.key.toLowerCase() === key.toLowerCase()) {
+            onSelectLetter(key);
+          }
+        });
+      }
+    },
+    [gameOver, keys1, keys2, keys3, onDelete, onEnter, onSelectLetter]
+  );
+
+  useEffect(() => {
+    document.addEventListener("keydown", handleKeyboard);
+
+    return () => {
+      document.removeEventListener("keydown", handleKeyboard);
+    };
+  }, [handleKeyboard]);
+
+  console.log(disabledLetters);
+
+  return (
+    <div className="keyboard" onKeyDown={handleKeyboard}>
+      <div className="line1">
+        {keys1.map((key) => {
+          return (
+            <Key
+              keyVal={key}
+              disabled={disabledLetters.includes(key)}
+              selected={
+                currAttempt.letter < 5 &&
+                board[currAttempt.attempt][currAttempt.letter] === key
+              }
+              correct={
+                correctWord &&
+                currAttempt.letter < 5 &&
+                correctWord.includes(key)
+              }
+            />
+          );
+        })}
+      </div>
+      <div className="line2">
+        {keys2.map((key) => {
+          return (
+            <Key
+              keyVal={key}
+              disabled={disabledLetters.includes(key)}
+              selected={
+                currAttempt.letter < 5 &&
+                board[currAttempt.attempt][currAttempt.letter] === key
+              }
+              correct={
+                correctWord &&
+                currAttempt.letter < 5 &&
+                correctWord.includes(key)
+              }
+            />
+          );
+        })}
+      </div>
+      <div className="line3">
+        <Key keyVal={"ENTER"} bigKey />
+        {keys3.map((key) => {
+          return (
+            <Key
+              keyVal={key}
+              disabled={disabledLetters.includes(key)}
+              selected={
+                currAttempt.letter < 5 &&
+                board[currAttempt.attempt][currAttempt.letter] === key
+              }
+              correct={
+                correctWord &&
+                currAttempt.letter < 5 &&
+                correctWord.includes(key)
+              }
+            />
+          );
+        })}
+        <Key keyVal={"DELETE"} bigKey />
+      </div>
+    </div>
+  );
+}
+
+export default Keyboard;
